@@ -3,9 +3,9 @@ Java visualization  of the A* path finding algorithm created using https://proce
 You can run your own visualization by downloading the Processing and importing .pde file.
 
 # Controls
-To set start and destination point press mouse wheel on the grid cell
-To draw walls use left mouse button
-To erase wall use rigt mouse button
+To set start and destination point press mouse wheel on the grid cell <br>
+To draw walls use left mouse button <br>
+To erase wall use rigt mouse button <br>
 To start visualization press space
 
 # Visualization
