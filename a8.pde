@@ -15,6 +15,7 @@ List<Cell> path;
 
 
 void setup() {
+  // size(1820, 980);
   size(800, 800);
   background(255);
   
@@ -33,6 +34,9 @@ void setup() {
   
   start = cells[0][0];
   goal = cells[width / cellSize - 1][height / cellSize - 1];
+  
+  start.isWall = false;
+  goal.isWall = false;
   
   openSet.add(start);
   start.g = 0;
@@ -76,7 +80,7 @@ void draw() {
      openSet.remove(x);
      
      for (Cell y : x.neighbors) {
-       if (closedSet.contains(y)) {
+       if (closedSet.contains(y) || y.isWall) {
          continue;
        }
        
@@ -128,15 +132,20 @@ class Cell {
   float h;
   List<Cell> neighbors;
   Cell p;
+  boolean isWall;
   
   Cell(int x, int y) {
     this.x = x;
     this.y = y;
     this.neighbors = new ArrayList();
+    this.isWall = random(1) < 0.2;
   }
   
   void show(color c) {
     fill(c);
+    if (isWall) {
+      fill(0);
+    }
     strokeWeight(1);
     rect(x * cellSize, y * cellSize, cellSize, cellSize);
   }
