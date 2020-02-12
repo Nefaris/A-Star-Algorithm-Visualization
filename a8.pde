@@ -85,7 +85,7 @@ void draw() {
        
        if (!openSet.contains(y)) {
          openSet.add(y);
-         y.h = (int) dist(y.x, y.y, goal.x, goal.y);
+         y.h = dist(y.x, y.y, goal.x, goal.y);
          tBetter = true;
        } else if (tg < y.g) {
          tBetter = true;
