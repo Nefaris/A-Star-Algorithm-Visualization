@@ -1,6 +1,5 @@
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 
 int cellSize = 50;
@@ -13,6 +12,7 @@ Cell start;
 Cell goal;
 
 List<Cell> path;
+
 
 void setup() {
   size(800, 800);
@@ -143,19 +143,19 @@ class Cell {
   
   void findNeighbors(Cell[][] grid) {
     if (x < width / cellSize - 1) {
-      neighbors.add(cells[x + 1][y]);
+      neighbors.add(grid[x + 1][y]);
     }
     
     if (x > 0) {
-      neighbors.add(cells[x - 1][y]);
+      neighbors.add(grid[x - 1][y]);
     }
     
     if (y > 0) {
-      neighbors.add(cells[x][y - 1]);
+      neighbors.add(grid[x][y - 1]);
     }
     
     if (y < height / cellSize - 1) {
-      neighbors.add(cells[x][y + 1]);
+      neighbors.add(grid[x][y + 1]);
     }
   }
 }
