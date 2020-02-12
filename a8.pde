@@ -1,9 +1,13 @@
 import java.util.List;
 import java.util.ArrayList;
 
-
-int cellSize = 50;
 Cell[][] cells;
+
+// TWEAKS ----------------------------
+int cellSize = 20;
+boolean fillWithRandomWalls = true;
+float spawnWallChance = 0.3;
+boolean showOnlyPath = true;
 
 List<Cell> openSet;
 List<Cell> closedSet;
@@ -13,9 +17,10 @@ Cell goal;
 
 List<Cell> path;
 
+String state;
+boolean switcher;
 
 void setup() {
-  // size(1820, 980);
   size(800, 800);
   background(255);
   
@@ -25,6 +30,13 @@ void setup() {
   for (int i = 0; i < cells.length; i++) {
     for (int j = 0; j < cells[i].length; j++) {
       cells[i][j] = new Cell(i, j);
+    }
+  }
+  
+  // find neighbors for each cell
+  for (int i = 0; i < cells.length; i++) {
+    for (int j = 0; j < cells[i].length; j++) {
+      cells[i][j].findNeighbors(cells);
     }
   }
   
@@ -39,25 +51,26 @@ void setup() {
   goal.isWall = false;
   
   openSet.add(start);
-  start.g = 0;
- 
-  // find neighbors
-  for (int i = 0; i < cells.length; i++) {
-    for (int j = 0; j < cells[i].length; j++) {
-      cells[i][j].findNeighbors(cells);
-    }
-  }
   
-  // show cells in grid
-  for (int i = 0; i < cells.length; i++) {
-    for (int j = 0; j < cells[i].length; j++) {
-      cells[i][j].show(color(255));
-    }
-  }
+  drawCells();
+  
+  state = "drawing";
+  switcher = true;
 }
 
+void draw() {
+  if (state == "drawing") {
+    if (mousePressed && (mouseButton == LEFT)) {
+      cells[mouseX / cellSize][mouseY / cellSize].isWall = true;
+    } else if (mousePressed && (mouseButton == RIGHT)) {
+      cells[mouseX / cellSize][mouseY / cellSize].isWall = false;
+    }
+    
+    drawCells();
+    drawEndpoints();
+  }
 
-void draw() {  
+  if (state != "solving") return;
   if (openSet.size() > 0) {
      Cell x = getLowestFscoreCell(openSet);
      
@@ -72,7 +85,7 @@ void draw() {
      
      // path found
      if (x.equals(goal)) {
-       print("DONE!");
+       println("DONE! PATH LENGTH: " + path.size());
        noLoop();
      }
      
@@ -101,29 +114,54 @@ void draw() {
          y.f = y.g + y.h;
        }
      }
+  } else {
+    println("NO SLUTION FOUND");
+    noLoop();
   }
   
-  // draw clsoed set
-  for (Cell c : closedSet) {
-    c.show(color(255, 0, 0));
-  }
-  
-  // draw open set
-  for (Cell c: openSet) {
-    c.show(color(0, 255, 0));
-  }
-  
-  // draw path
-  for (Cell c : path) {
-    c.show(color(0, 0, 255));
-  }
-  
-  // draw start and goal
-  goal.show(color(255, 255, 0));
-  start.show(color(255, 255, 0));
+  drawCells();
+  drawClosedSet();
+  drawOpenSet();
+  drawPath();
+  drawEndpoints();
 }
 
 
+// DRAW FUNCTIONS -------------------------------------------------------------------
+void drawEndpoints() {
+  start.show(color(255, 195, 18));
+  goal.show(color(237, 76, 103));
+}
+
+void drawOpenSet() {
+  if (showOnlyPath) return;
+  for (Cell c: openSet) {
+    c.show(color(0, 255, 0));
+  }
+}
+
+void drawClosedSet() {
+  if (showOnlyPath) return;
+  for (Cell c : closedSet) {
+    c.show(color(234, 32, 39));
+  }
+}
+
+void drawPath() {
+  for (Cell c : path) {
+    c.show(color(52, 152, 219));
+  }
+}
+
+void drawCells() {
+  for (int i = 0; i < cells.length; i++) {
+    for (int j = 0; j < cells[i].length; j++) {
+      cells[i][j].show(color(255));
+    }
+  }
+}
+
+// CELL CLASS -----------------------------------------------------------------------
 class Cell {
   int x;
   int y;
@@ -138,7 +176,12 @@ class Cell {
     this.x = x;
     this.y = y;
     this.neighbors = new ArrayList();
-    this.isWall = random(1) < 0.2;
+    
+    if (fillWithRandomWalls) {
+      this.isWall = random(1) < spawnWallChance;
+    } else {
+      isWall = false;
+    }
   }
   
   void show(color c) {
@@ -166,9 +209,28 @@ class Cell {
     if (y < height / cellSize - 1) {
       neighbors.add(grid[x][y + 1]);
     }
+    
+    
+    if (x < width / cellSize - 1 && y > 0) {
+      neighbors.add(grid[x + 1][y - 1]);
+    }
+    
+    if (x < width / cellSize - 1 && y < height / cellSize - 1) {
+      neighbors.add(grid[x + 1][y + 1]);
+    }
+    
+    if (x > 0 && y < height / cellSize - 1) {
+      neighbors.add(grid[x - 1][y + 1]);
+    }
+    
+    if (x > 0 && y > 0) {
+      neighbors.add(grid[x - 1][y - 1]);
+    }
   }
 }
 
+
+// UTILS ------------------------------------------------------------------
 Cell getLowestFscoreCell(List<Cell> cellList) {
   Cell lowest = cellList.get(0);
   
@@ -179,4 +241,31 @@ Cell getLowestFscoreCell(List<Cell> cellList) {
   }
   
   return lowest;
+}
+
+
+// CONTROLS ---------------------------------------------------------------
+void keyPressed() {
+  if (keyCode == 32) {
+    state = "solving";
+  }
+}
+
+void mousePressed() {
+  if (mouseButton == CENTER) {
+    Cell temp = cells[mouseX / cellSize][mouseY / cellSize];
+    
+    if (switcher) {
+      start = temp;
+      start.isWall = false;
+      openSet.clear();
+      openSet.add(start);
+    }
+    else {
+      goal = temp;
+      goal.isWall = false;
+    }
+    
+    switcher = !switcher;
+  }
 }
