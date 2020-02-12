@@ -7,7 +7,7 @@ Cell[][] cells;
 int cellSize = 20;
 boolean fillWithRandomWalls = true;
 float spawnWallChance = 0.3;
-boolean showOnlyPath = true;
+boolean showOnlyPath = false;
 
 List<Cell> openSet;
 List<Cell> closedSet;
@@ -119,7 +119,7 @@ void draw() {
     noLoop();
   }
   
-  drawCells();
+  if (showOnlyPath) drawCells();
   drawClosedSet();
   drawOpenSet();
   drawPath();
@@ -245,7 +245,7 @@ Cell getLowestFscoreCell(List<Cell> cellList) {
 
 
 // CONTROLS ---------------------------------------------------------------
-void keyPressed() {
+void keyReleased() {
   if (keyCode == 32) {
     state = "solving";
   }
