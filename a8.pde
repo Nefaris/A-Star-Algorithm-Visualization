@@ -8,6 +8,7 @@ int cellSize = 20;
 boolean fillWithRandomWalls = true;
 float spawnWallChance = 0.3;
 boolean showOnlyPath = false;
+boolean canGoDiagonal = false;
 
 List<Cell> openSet;
 List<Cell> closedSet;
@@ -99,7 +100,7 @@ void draw() {
                 continue;
             }
 
-            float tg = x.g + 1;
+            float tg = x.g + .1;
             boolean tBetter = false;
 
             if (!openSet.contains(y)) {
@@ -213,20 +214,22 @@ class Cell {
             neighbors.add(grid[x][y + 1]);
         }
 
-        if (x < width / cellSize - 1 && y > 0) {
-            neighbors.add(grid[x + 1][y - 1]);
-        }
-
-        if (x < width / cellSize - 1 && y < height / cellSize - 1) {
-            neighbors.add(grid[x + 1][y + 1]);
-        }
-
-        if (x > 0 && y < height / cellSize - 1) {
-            neighbors.add(grid[x - 1][y + 1]);
-        }
-
-        if (x > 0 && y > 0) {
-            neighbors.add(grid[x - 1][y - 1]);
+        if (canGoDiagonal) {
+            if (x < width / cellSize - 1 && y > 0) {
+                neighbors.add(grid[x + 1][y - 1]);
+            }
+    
+            if (x < width / cellSize - 1 && y < height / cellSize - 1) {
+                neighbors.add(grid[x + 1][y + 1]);
+            }
+    
+            if (x > 0 && y < height / cellSize - 1) {
+                neighbors.add(grid[x - 1][y + 1]);
+            }
+    
+            if (x > 0 && y > 0) {
+                neighbors.add(grid[x - 1][y - 1]);
+            }
         }
     }
 }
