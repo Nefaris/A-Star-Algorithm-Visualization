@@ -21,23 +21,23 @@ String state;
 boolean switcher;
 
 void setup() {
-    size(800, 800);
-    background(255);
+	size(800, 800);
+	background(255);
 
-    cells = new Cell[width / cellSize][height / cellSize];
+	cells = new Cell[width / cellSize][height / cellSize];
 
-    // create cells in grid
-    for (int i = 0; i < cells.length; i++) {
-        for (int j = 0; j < cells[i].length; j++) {
-            cells[i][j] = new Cell(i, j);
-        }
-    }
+	// create cells in grid
+	for (int i = 0; i < cells.length; i++) {
+		for (int j = 0; j < cells[i].length; j++) {
+			cells[i][j] = new Cell(i, j);
+		}
+	}
 
   	// find neighbors for each cell
   	for (int i = 0; i < cells.length; i++) {
-    	for (int j = 0; j < cells[i].length; j++) {
-      		cells[i][j].findNeighbors(cells);
-    	}
+		for (int j = 0; j < cells[i].length; j++) {
+	  		cells[i][j].findNeighbors(cells);
+		}
   	}
 
   	closedSet = new ArrayList();
@@ -58,43 +58,43 @@ void setup() {
   	switcher = true;
 }
 
-void draw() {    
+void draw() {
   	if (state == "drawing") {
-        if (mouseX > 0 && mouseY > 0 && mouseX < width && mouseY < height) {
-            if (mousePressed && (mouseButton == LEFT)) {
-                cells[mouseX / cellSize][mouseY / cellSize].isWall = true;
-            } else if (mousePressed && (mouseButton == RIGHT)) {
-                cells[mouseX / cellSize][mouseY / cellSize].isWall = false;
-            }
-        }
-      
-    	drawCells();
-    	drawEndpoints();
+		if (mouseX > 0 && mouseY > 0 && mouseX < width && mouseY < height) {
+			if (mousePressed && (mouseButton == LEFT)) {
+				cells[mouseX / cellSize][mouseY / cellSize].isWall = true;
+			} else if (mousePressed && (mouseButton == RIGHT)) {
+				cells[mouseX / cellSize][mouseY / cellSize].isWall = false;
+			}
+		}
+
+		drawCells();
+		drawEndpoints();
   	}
 
   	if (state != "solving") return;
   	if (openSet.size() > 0) {
-     	Cell x = getLowestFscoreCell(openSet);
+	 	Cell x = getLowestFscoreCell(openSet);
 
-     	// set actual path
-     	Cell temp = x;
-     	path.clear();
-     	path.add(temp);
-     	while (temp.p != null) {
-       		path.add(temp.p);
-       		temp = temp.p;
-     	}
+	 	// set actual path
+	 	Cell temp = x;
+	 	path.clear();
+	 	path.add(temp);
+	 	while (temp.p != null) {
+	   		path.add(temp.p);
+	   		temp = temp.p;
+	 	}
 
-     	// path found
-     	if (x.equals(goal)) {
-       		println("DONE! PATH LENGTH: " + path.size());
-       		noLoop();
-     	}
+	 	// path found
+	 	if (x.equals(goal)) {
+	   		println("DONE! PATH LENGTH: " + path.size());
+	   		noLoop();
+	 	}
 
-     	closedSet.add(x);
-     	openSet.remove(x);
+	 	closedSet.add(x);
+	 	openSet.remove(x);
 
-     	for (Cell y : x.neighbors) {
+	 	for (Cell y : x.neighbors) {
 			if (closedSet.contains(y) || y.isWall) {
 				continue;
 			}
@@ -115,13 +115,13 @@ void draw() {
 				y.g = tg;
 				y.f = y.g + y.h;
 			}
-    	}
+		}
   	} else {
-    	println("NO SLUTION FOUND");
-    	noLoop();
+		println("NO SLUTION FOUND");
+		noLoop();
   	}
 
-    if (showOnlyPath) drawCells();
+	if (showOnlyPath) drawCells();
   	drawClosedSet();
   	drawOpenSet();
   	drawPath();
@@ -138,28 +138,28 @@ void drawEndpoints() {
 void drawOpenSet() {
   	if (showOnlyPath) return;
   	for (Cell c: openSet) {
-    	c.show(color(0, 255, 0));
+		c.show(color(0, 255, 0));
   	}
 }
 
 void drawClosedSet() {
   	if (showOnlyPath) return;
   	for (Cell c : closedSet) {
-    	c.show(color(234, 32, 39));
+		c.show(color(234, 32, 39));
   	}
 }
 
 void drawPath() {
-  	for (Cell c : path) {        
-    	c.show(color(52, 152, 219));
+  	for (Cell c : path) {
+		c.show(color(52, 152, 219));
   	}
 }
 
 void drawCells() {
   	for (int i = 0; i < cells.length; i++) {
-    	for (int j = 0; j < cells[i].length; j++) {
-      		cells[i][j].show(color(255));
-    	}
+		for (int j = 0; j < cells[i].length; j++) {
+	  		cells[i][j].show(color(255));
+		}
   	}
 }
 
@@ -175,61 +175,60 @@ class Cell {
   	boolean isWall;
 
   	Cell(int x, int y) {
-    	this.x = x;
-    	this.y = y;
-    	this.neighbors = new ArrayList();
+		this.x = x;
+		this.y = y;
+		this.neighbors = new ArrayList();
 
 		if (fillWithRandomWalls) {
-    		this.isWall = random(1) < spawnWallChance;
-    	} else {
-    		isWall = false;
+			this.isWall = random(1) < spawnWallChance;
+		} else {
+			isWall = false;
 		}
 	}
 
-    void show(color c) {
-        fill(c);
-        if (isWall) {
-            fill(0);
-        }
-    
-        strokeWeight(1);
-        rect(x * cellSize, y * cellSize, cellSize, cellSize);
-    }
+	void show(color c) {
+		fill(c);
+		if (isWall) {
+			fill(0);
+		}
 
-    void findNeighbors(Cell[][] grid) {
-        if (x < width / cellSize - 1) {
-          	neighbors.add(grid[x + 1][y]);
-        }
-    
-        if (x > 0) {
-          	neighbors.add(grid[x - 1][y]);
-        }
-    
-        if (y > 0) {
-          	neighbors.add(grid[x][y - 1]);
-        }
-    
-        if (y < height / cellSize - 1) {
-          	neighbors.add(grid[x][y + 1]);
-        }
-    
-    
-        if (x < width / cellSize - 1 && y > 0) {
-          	neighbors.add(grid[x + 1][y - 1]);
-        }
-    
-        if (x < width / cellSize - 1 && y < height / cellSize - 1) {
-          	neighbors.add(grid[x + 1][y + 1]);
-        }
-    
-        if (x > 0 && y < height / cellSize - 1) {
-          	neighbors.add(grid[x - 1][y + 1]);
-        }
-    
-        if (x > 0 && y > 0) {
-          	neighbors.add(grid[x - 1][y - 1]);
-     	}
-    }
+		strokeWeight(1);
+		rect(x * cellSize, y * cellSize, cellSize, cellSize);
+	}
+
+	void findNeighbors(Cell[][] grid) {
+		if (x < width / cellSize - 1) {
+		  	neighbors.add(grid[x + 1][y]);
+		}
+
+		if (x > 0) {
+		  	neighbors.add(grid[x - 1][y]);
+		}
+
+		if (y > 0) {
+		  	neighbors.add(grid[x][y - 1]);
+		}
+
+		if (y < height / cellSize - 1) {
+		  	neighbors.add(grid[x][y + 1]);
+		}
+
+		if (x < width / cellSize - 1 && y > 0) {
+		  	neighbors.add(grid[x + 1][y - 1]);
+		}
+
+		if (x < width / cellSize - 1 && y < height / cellSize - 1) {
+		  	neighbors.add(grid[x + 1][y + 1]);
+		}
+
+		if (x > 0 && y < height / cellSize - 1) {
+		  	neighbors.add(grid[x - 1][y + 1]);
+		}
+
+		if (x > 0 && y > 0) {
+		  	neighbors.add(grid[x - 1][y - 1]);
+	 	}
+	}
 }
 
 
@@ -250,24 +249,24 @@ Cell getLowestFscoreCell(List<Cell> cellList) {
 // CONTROLS ---------------------------------------------------------------
 void keyReleased() {
   	if (keyCode == 32) {
-    	state = "solving";
+		state = "solving";
   	}
 }
 
 void mousePressed() {
   	if (mouseButton == CENTER) {
-    	Cell temp = cells[mouseX / cellSize][mouseY / cellSize];
-    
-        if (switcher) {
-          	start = temp;
-          	start.isWall = false;
-          	openSet.clear();
-          	openSet.add(start);
-        } else {
-          	goal = temp;
-          	goal.isWall = false;
-        }
-    
-        switcher = !switcher;
+		Cell temp = cells[mouseX / cellSize][mouseY / cellSize];
+
+		if (switcher) {
+		  	start = temp;
+		  	start.isWall = false;
+		  	openSet.clear();
+		  	openSet.add(start);
+		} else {
+		  	goal = temp;
+		  	goal.isWall = false;
+		}
+
+		switcher = !switcher;
   	}
 }
