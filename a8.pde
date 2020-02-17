@@ -4,8 +4,8 @@ import java.util.ArrayList;
 Cell[][] cells;
 
 // TWEAKS ----------------------------
-int cellSize = 20;
-boolean fillWithRandomWalls = true;
+int cellSize = 40;
+boolean fillWithRandomWalls = false;
 float spawnWallChance = 0.3;
 boolean showOnlyPath = false;
 boolean canGoDiagonal = false;

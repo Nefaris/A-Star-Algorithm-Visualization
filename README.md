@@ -2,6 +2,8 @@
 Java visualization  of the A* path finding algorithm created using https://processing.org.
 You can run your own visualization by downloading the Processing and importing .pde file.
 
+Online web demo in javascript version: https://editor.p5js.org/Nefaris/sketches/-9DLwhbg
+
 # Controls
 To set start and destination point press mouse wheel on the grid cell <br>
 To draw walls use left mouse button <br>
